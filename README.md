@@ -10,7 +10,7 @@ An analysis of power outages data in the continental US from January 2000 to Jul
 <h1>Framing a Prediction Problem</h1>
 
 
-<h1>Baseline Model></h1>
+<h1>Baseline Model</h1>
 
 
 <h1>Final Model</h1>
