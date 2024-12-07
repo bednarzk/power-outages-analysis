@@ -22,6 +22,26 @@ Some other variables I am especially interested in to see their possible connect
 
 # Data Cleaning and Exploratory Data Analysis
 
+## Data Cleaning
+OUTAGE.START.DATE and OUTAGE.START.TIME:
+
+The original data contained two separate columns for the start date and time of the outage. I consolidated these columns into one column OUTAGE.START, which is a datetime variable. It will be easier to work with this variable as a datetime object later in exploration and prediction. Then, I dropped the old variables OUTAGE.START.DATE and OUTAGE.START.TIME, which now is entirely contained in OUTAGE.START and were repetitive otherwise.
+
+OUTAGE.RESTORATION.DATE and OUTAGE.RESTORATION.TIME:
+
+Just like for the start date and time of the outage, the original data had two columns for the outage restoration date and time. Similarly, I consolidated these columns into one column OUTAGE.RESTORATION. I also dropped the old variables OUTAGE.RESTORATION.DATE and OUTAGE.RESTORATION.TIME.
+
+YEAR:
+
+Since our data is only from the years 2000 to 2016, I added a column YEARS AFTER 2000. Subtracting 2000 from the YEAR column may make feature engineering easier later on if I want to create polynomial or exponential features based on the year.
+
+CAUSE.CATEGORY.DETAIL:
+
+Many of the detailed categories are repetitive that are being counted separately due to manual errors. I wanted to combine as many of the same categories as possible. I stripped all the categories to remove whitespace causing some of them to be counted separately (ex. 'Coal' and ' Coal'). I bucketed 'thunderstorm; islanding' into 'thunderstorm', 'snow/ice storm' and 'hailstorm' into 'winter storm', 'wind' and 'wind storm' into 'heavy wind', 'wind/rain' into 'storm', and 'snow/ice' into 'winter'.
+
+POP_URBAN and POP_UC:
+
+The original data includes values for the state's population and also percentages of urban population in that state, but not the total number of people in urban areas. I created a column POP_URBAN, the total number of people in urban areas in the state, by multiplying the POPULATION and POPPCT_URBAN (% of urban population in the state). Similarly, there is a variable for the percentage of people living in urban clusters per state, but not the total number of people living in urban clusters. I created variable POP_UC, the total number of people living in urban clusters in the state, by multiplying the POPULATION and POPPCT_UC variables.
 
 # Framing a Prediction Problem
 
