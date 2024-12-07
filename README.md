@@ -62,10 +62,25 @@ Here are the first 10 rows and first 11 columns.
 
 <iframe
   src="assets/fig1.html"
-  width="800"
+  width="1100"
   height="600"
   frameborder="0"
 ></iframe>
+
+This is the distribution of the primary variable that I'm interested in, CUSTOMERS.AFFECTED. Most of the data is clustered close to the left side of the box plot, indicating that the vast majority of outages affect 150,000 or less customers. The median number of custoemrs affected is around 70,000. However, there are still some outages that affected more than 500,000 people, with a maximum of over 3 million customers affected, however this does not appear to be the norm.
+
+<iframe
+  src="assets/fig2.html"
+  width="1100"
+  height="600"
+  frameborder="0"
+></iframe>
+
+This choropleth shows the geographic distribution of the total number of outages recorded from 2000 to 2016. It appears that California and Texas have the highest total number of outages, with 210 and 127 outages, respectively. There also seems to be a higher number of total outages in Washington and the Midwest. It appears that there may be geographic factors affecting the *number* of outages, but it is still unclear whether the number of outages is indicative of the *size* of the outages based on number of customers affected.
+
+## Bivariate Analysis
+
+
 
 # Framing a Prediction Problem
 
