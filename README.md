@@ -43,6 +43,8 @@ POP_URBAN and POP_UC:
 
 The original data includes values for the state's population and also percentages of urban population in that state, but not the total number of people in urban areas. I created a column POP_URBAN, the total number of people in urban areas in the state, by multiplying the POPULATION and POPPCT_URBAN (% of urban population in the state). Similarly, there is a variable for the percentage of people living in urban clusters per state, but not the total number of people living in urban clusters. I created variable POP_UC, the total number of people living in urban clusters in the state, by multiplying the POPULATION and POPPCT_UC variables.
 
+Here are the first 10 rows and first 11 columns.
+
 |   OBS |   YEAR |   MONTH | U.S._STATE   | POSTAL.CODE   | NERC.REGION   | CLIMATE.REGION     |   ANOMALY.LEVEL | CLIMATE.CATEGORY   | CAUSE.CATEGORY     | CAUSE.CATEGORY.DETAIL   |
 |------:|-------:|--------:|:-------------|:--------------|:--------------|:-------------------|----------------:|:-------------------|:-------------------|:------------------------|
 |     1 |   2011 |       7 | Minnesota    | MN            | MRO           | East North Central |            -0.3 | normal             | severe weather     | nan                     |
@@ -55,6 +57,15 @@ The original data includes values for the state's population and also percentage
 |     8 |   2005 |       6 | Minnesota    | MN            | MRO           | East North Central |             0.2 | normal             | severe weather     | thunderstorm            |
 |     9 |   2015 |       3 | Minnesota    | MN            | MRO           | East North Central |             0.6 | warm               | intentional attack | sabotage                |
 |    10 |   2013 |       6 | Minnesota    | MN            | MRO           | East North Central |            -0.2 | normal             | severe weather     | winter storm            |
+
+## Univariate Analysis
+
+<iframe
+  src="assets/fig1.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
 
 # Framing a Prediction Problem
 
