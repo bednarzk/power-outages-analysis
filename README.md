@@ -80,6 +80,23 @@ This choropleth shows the geographic distribution of the total number of outages
 
 ## Bivariate Analysis
 
+<iframe
+  src="assets/fig3.html"
+  width="1100"
+  height="600"
+  frameborder="0"
+></iframe>
+
+Here we are analyzing the number of customers affected by power outages based on the year. It appears that most of the largest magnitude outages (over 1M customers affected) occurred prior to 2011. It appears that the variability in the number of customers affected may have decreased over time, leading to fewer large-scale outage events. The most recent year we have data for, 2016, only had a maximum of 415,000 customers affected by a single outage, compared to millions of customers affected in previous years. It may be the case that future outages, on average, are less severe than past outages if this trend continues.
+
+<iframe
+  src="assets/fig4.html"
+  width="1100"
+  height="600"
+  frameborder="0"
+></iframe>
+
+Again, we are looking at a geographic distribution of outages, but now, we are looking at the average number of customers affected per state rather than just the number of outages. While California and Texas are still two of the highest severity states on average, Florida has the highest average customers affected. South Carolina and Illinois now stand out a bit more as having large-severity outages, showing a trend of higher severity outages in the Midwest and Eastern states. There may be a reason that these states in partcular tend to have widespread outages, but this would required further research.
 
 
 # Framing a Prediction Problem
