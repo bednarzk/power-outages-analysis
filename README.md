@@ -98,11 +98,128 @@ Here we are analyzing the number of customers affected by power outages based on
 
 Again, we are looking at a geographic distribution of outages, but now, we are looking at the average number of customers affected per state rather than just the number of outages. While California and Texas are still two of the highest severity states on average, Florida has the highest average customers affected. South Carolina and Illinois now stand out a bit more as having large-severity outages, showing a trend of higher severity outages in the Midwest and Eastern states. There may be a reason that these states in partcular tend to have widespread outages, but this would required further research.
 
+## Interesting Aggregates
+
+Now, let's take a look at the average number of customers affected based on NERC.REGION.
+
+| NERC.REGION   |   CUSTOMERS.AFFECTED |
+|:--------------|---------------------:|
+| HI            |               294000 |
+| FRCC          |               289778 |
+| ECAR          |               256354 |
+| TRE           |               226469 |
+| SPP           |               188513 |
+| WECC          |               133833 |
+| RFC           |               127894 |
+| HECO          |               126729 |
+| NPCC          |               108726 |
+| SERC          |               107854 |
+| MRO           |                88985 |
+| PR            |                62000 |
+| ASCC          |                14273 |
+| FRCC, SERC    |                  nan |
+
+It appears that there is some variation in the average number of customers affected per outage based on the NERC.REGION. Region HI has the highest average, although this region has had less than 5 total outages, so this may not be a large enough sample size to compare to other regions. Regions FRCC, ECAR, and TRE also had an average of over 200,000 customers affected. Regions MRO, PR, and ASCC are among the smallest average number of customers affected. Interestingly, region FRCC, SERC has no data on the number of customers affected.
+
+## Imputation
+
+CUSTOMERS.AFFECTED has 443 rows with null values. Since this is the variable that we will eventually want to predict, I will perform listwise deletion since we will not be able to use these observations to train our models or to determine the accuracy of our model.
+
+OUTAGE.START has 7 null values. These rows are also missing a value for MONTH, so we do not have any information about when the outage was except for the year. I will perform listwise deletion because I will not lose too much data.
+
+RES.PRICE and POPDEN_UC only have 9 observations missing, so again I will perform listwise deletion since we are not losing too much information. All the missing values of POPDEN_UC are from Washington, D.C., so we should recognize that our model should not be used to predict outages in D.C. since we've removed all its data.
+
+We would not know OUTAGE.RESTORATION, OUTAGE.DURATION, or DEMAND.LOSS.MW at the time of prediction, so we can leave all their null values.
+
+<iframe
+  src="assets/fig5.html"
+  width="1100"
+  height="600"
+  frameborder="0"
+></iframe>
+
+CLIMATE.REGION has 5 missing values, all of which are from Hawaii. None of the existing climate region categories make sense for Hawaii, so I created a new category called "Hawaii."
+
+<iframe
+  src="assets/fig6.html"
+  width="1100"
+  height="600"
+  frameborder="0"
+></iframe>
+
+The 'Hawaii' category is now included as the climate region with the least outages.
+
+HURRICANE.NAMES does not have any predictive power so we can leave the null values since we will not use this column in our predictive model.
+
+<iframe
+  src="assets/fig7.html"
+  width="1100"
+  height="600"
+  frameborder="0"
+></iframe>
+
+Many CAUSE.CATEGORY.DETAIL values are missing, which is expected since this column just has more detailed information for some observations. I will bucket the null values into a 'No Information' category so that we can see if the fact that they have no information has any predictive power. 
+
+<iframe
+  src="assets/fig8.html"
+  width="1100"
+  height="600"
+  frameborder="0"
+></iframe>
+
+The "No Information" category is now included as the category with the most outages.
+
+Any columns where listwise deletion occurred will look identical.
+
 
 # Framing a Prediction Problem
+
+The prediction problem that I will be analyzing is: Predict the severity (in terms of number of customers) of a major power outage. This is a regression problem, since the CUSTOMERS.AFFECTED variable is a continuous numerical variable. The response variable is CUSTOMERS.AFFECTED since I believe that this would be a good indicator for how urgent a power outage needs to be fixed. Even if an outage has a long duration, if it's in a location with few to no customers, it shouldn't necessarily be the most urgent thing to resolve. By predicting the number of customers affected by an outage, energy companies can send their resources to fix those issues faster, and therefore help as many people as possible more quickly. I will be evaluating my model based on the lowest mean squared error so that predictions further from the actual value are penalized more harshly than in mean absolute error, for example.
+
+For this prediction problem, I am assuming that an energy company has just found out about an outage and its cause, but do not yet have an esimate about how many customers this outage has affected. In this case, the energy company would not know the time of restoration (OUTAGE.RESTORATION), the length of the outage (OUTAGE.DURATION), or the amount of peak demand lost during the outage (DEMAND.LOSS.MW). Therefore, I will drop these columns before training my models. All other variables I would know at the time of prediction.
 
 
 # Baseline Model
 
+My baseline model performs a basic multiple linear regression using all the features of my data (after removing OBS, HURRICANE.NAMES, U.S._STATE, TOTAL.PRICE, TOTAL.SALES, TOTAL.CUSTOMERS, AND YEAR).
+
+The following are features in my model:
+
+'MONTH', 'POSTAL.CODE', 'NERC.REGION', 'CLIMATE.REGION',
+       'ANOMALY.LEVEL', 'CLIMATE.CATEGORY', 'CAUSE.CATEGORY',
+       'CAUSE.CATEGORY.DETAIL', 'RES.PRICE', 'COM.PRICE', 'IND.PRICE',
+       'RES.SALES', 'COM.SALES', 'IND.SALES', 'RES.PERCEN', 'COM.PERCEN',
+       'IND.PERCEN', 'RES.CUSTOMERS', 'COM.CUSTOMERS', 'IND.CUSTOMERS',
+       'RES.CUST.PCT', 'COM.CUST.PCT', 'IND.CUST.PCT', 'PC.REALGSP.STATE',
+       'PC.REALGSP.USA', 'PC.REALGSP.REL', 'PC.REALGSP.CHANGE', 'UTIL.REALGSP',
+       'TOTAL.REALGSP', 'UTIL.CONTRI', 'PI.UTIL.OFUSA', 'POPULATION',
+       'POPPCT_URBAN', 'POPPCT_UC', 'POPDEN_URBAN', 'POPDEN_UC',
+       'POPDEN_RURAL', 'AREAPCT_URBAN', 'AREAPCT_UC', 'PCT_LAND',
+       'PCT_WATER_TOT', 'PCT_WATER_INLAND', 'OUTAGE.START', 'YEARS AFTER 2000',
+       'POP_URBAN', 'POP_UC'
+
+- Ordinal: 2 (MONTH, CLIMATE.CATEGORY)
+- Nominal: 5 (POSTAL.CODE, NERC.REGION, CLIMATE.REGION, CLIMATE.CATEGORY, CAUSE.CATEGORY, CAUSE.CATEGORY.DETAILED)
+- Quantitative: 39 (all other variables)
+
+I encoded all my categorical variables using a One Hot Encoder.
+
+The mean squared error of this baseline model is 66,761,118,602. It is difficult to tell how well this model performed without comparing it to another model, so we can compare it to the constant model.
+
+I also calculated the mean squared error of a model that just predicted the mean of the training CUSTOMERS.AFFECTED variable on the unseen data. This model had a mean squared error of 65,501,779,872, which is lower than the MSE for the baseline model. This indicates that our baseline model performs worse than the constant model. This means that the baseline model is not doing a good job, and that it may potentially be overfitting to the training data.
+
 
 # Final Model
+
+For my final model, I added 3 new features and used a StandardScaler on my numerical features. First of all, I created 3 new features from my OUTAGE.START variable. This variable is a datetime object that contains a lot of information that our baseline model may not be capturing. I created a variable for the day of the month (from 1 to 31) of the outage to analyze whether more outages might occur towards the beginning or end of the month. Since this creates a numeric feature, I used a StandardScaler. Next, I created a feature for the hour the outage occurred. I was interested in whether outages that occurred in the middle of the night, for example, would affect more people than an outage in the morning or afternoon. Therefore, I found the hour of the outage, then discretized it into 4 buckets, from midnight to 6am, 6am to 12pm, 12pm to 6pm, and 6pm to 12am; this is an ordinal feature that was one hot encoded. Finally, I created a feature for the day of the week to see if outages on certain days of the week affected more customers. Therefore, I found the day of the week with Monday = 0, Tuesday = 1, ..., Sunday = 6, then one hot encoded these values; this is also an ordinal variable. Additionally, I used a StandardScaler to standardize all numerical variables. This is because for my final model, I used Lasso Regression. In lasso regression, the magnitude of the coefficients affects how much the model is penalized, so it is important that all variables are on the same scale before we use lasso. 
+
+For lasso regression, I used cross-validation to determine the best hyperparameter, alpha. Lasso regression performs variable selection by penalizing the magnitude of the coefficients on each of our features, therefore setting many of them to 0 if they do not have predictive power. The best alpha for lasso using cross-validation was 10,000. I chose the lasso model as my final model because it resulted in the lowest mean squared error on unseen test data; it had a MSE of 60,203,778,155, which was lower than the baseline model, the constant model, and the ridge model I also tested. This was an improvement of 6,557,340,447 over the baseline model!
+
+Here is a summary of the mean squared errors of each model I created:
+
+|                |         MSE |
+|:---------------|------------:|
+| base model     | 6.67611e+10 |
+| constant model | 6.55018e+10 |
+| ridge          | 6.35868e+10 |
+| lasso          | 6.02038e+10 |
