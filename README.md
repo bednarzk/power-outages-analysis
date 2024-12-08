@@ -14,7 +14,7 @@ Some other variables I am especially interested in to see their possible connect
 - CAUSE.CATEGORY, categories of all the events causing the major power outages
 - CAUSE.CATEGORY.DETAIL, a detailed description of the event categories causing the major power outages
 - POSTAL.CODE, the postal code of the U.S. state where the outage occurred
-- OUTAGE.DURATION, the duration of the outage event (in mintues)
+- OUTAGE.DURATION, the duration of the outage event (in minutes)
 - CLIMATE.CATEGORY, the climate episodes corresponding to the years ('Warm', 'Cold', or 'Normal' episodes)
 - YEAR, the year when the outage event occurred
 - NERC.REGION, the North American Electric Reliability Corporation (NERC) regions involved in the outage event
@@ -25,7 +25,7 @@ Some other variables I am especially interested in to see their possible connect
 ## Data Cleaning
 OUTAGE.START.DATE and OUTAGE.START.TIME:
 
-The original data contained two separate columns for the start date and time of the outage. I consolidated these columns into one column OUTAGE.START, which is a datetime variable. It will be easier to work with this variable as a datetime object later in exploration and prediction. Then, I dropped the old variables OUTAGE.START.DATE and OUTAGE.START.TIME, which now is entirely contained in OUTAGE.START and were repetitive otherwise.
+The original data contained two separate columns for the start date and time of the outage. I consolidated these columns into one column OUTAGE.START, which is a datetime variable. It will be easier to work with this variable as a datetime object later in exploration and prediction. Then, I dropped the old variables OUTAGE.START.DATE and OUTAGE.START.TIME, which now are entirely contained in OUTAGE.START and were repetitive otherwise.
 
 OUTAGE.RESTORATION.DATE and OUTAGE.RESTORATION.TIME:
 
@@ -37,13 +37,13 @@ Since our data is only from the years 2000 to 2016, I added a column YEARS AFTER
 
 CAUSE.CATEGORY.DETAIL:
 
-Many of the detailed categories are repetitive that are being counted separately due to manual errors. I wanted to combine as many of the same categories as possible. I stripped all the categories to remove whitespace causing some of them to be counted separately (ex. 'Coal' and ' Coal'). I bucketed 'thunderstorm; islanding' into 'thunderstorm', 'snow/ice storm' and 'hailstorm' into 'winter storm', 'wind' and 'wind storm' into 'heavy wind', 'wind/rain' into 'storm', and 'snow/ice' into 'winter'.
+Many of the detailed categories are repetitive and are being counted separately due to manual entry errors. I wanted to combine as many of the same categories as possible. I stripped all the categories to remove whitespace causing some of them to be counted separately (ex. 'Coal' and ' Coal'). I bucketed 'thunderstorm; islanding' into 'thunderstorm', 'snow/ice storm' and 'hailstorm' into 'winter storm', 'wind' and 'wind storm' into 'heavy wind', 'wind/rain' into 'storm', and 'snow/ice' into 'winter'.
 
 POP_URBAN and POP_UC:
 
 The original data includes values for the state's population and also percentages of urban population in that state, but not the total number of people in urban areas. I created a column POP_URBAN, the total number of people in urban areas in the state, by multiplying the POPULATION and POPPCT_URBAN (% of urban population in the state). Similarly, there is a variable for the percentage of people living in urban clusters per state, but not the total number of people living in urban clusters. I created variable POP_UC, the total number of people living in urban clusters in the state, by multiplying the POPULATION and POPPCT_UC variables.
 
-Here are the first 10 rows and first 11 columns.
+Here are the first 10 rows and first 11 columns of the cleaned data.
 
 |   OBS |   YEAR |   MONTH | U.S._STATE   | POSTAL.CODE   | NERC.REGION   | CLIMATE.REGION     |   ANOMALY.LEVEL | CLIMATE.CATEGORY   | CAUSE.CATEGORY     | CAUSE.CATEGORY.DETAIL   |
 |------:|-------:|--------:|:-------------|:--------------|:--------------|:-------------------|----------------:|:-------------------|:-------------------|:------------------------|
@@ -60,6 +60,8 @@ Here are the first 10 rows and first 11 columns.
 
 ## Univariate Analysis
 
+This is the distribution of the primary variable that I'm interested in, CUSTOMERS.AFFECTED.
+
 <iframe
   src="assets/fig1.html"
   width="1100"
@@ -67,7 +69,9 @@ Here are the first 10 rows and first 11 columns.
   frameborder="0"
 ></iframe>
 
-This is the distribution of the primary variable that I'm interested in, CUSTOMERS.AFFECTED. Most of the data is clustered close to the left side of the box plot, indicating that the vast majority of outages affect 150,000 or less customers. The median number of custoemrs affected is around 70,000. However, there are still some outages that affected more than 500,000 people, with a maximum of over 3 million customers affected, however this does not appear to be the norm.
+ Most of the data is clustered close to the left side of the box plot, indicating that the vast majority of outages affect 150,000 or less customers. The median number of customers affected is around 70,000. There are still some outages that affected more than 500,000 people, with a maximum of over 3 million customers affected, however this does not appear to be the norm.
+
+This choropleth shows the geographic distribution of the total number of outages recorded from 2000 to 2016.
 
 <iframe
   src="assets/fig2.html"
@@ -76,9 +80,11 @@ This is the distribution of the primary variable that I'm interested in, CUSTOME
   frameborder="0"
 ></iframe>
 
-This choropleth shows the geographic distribution of the total number of outages recorded from 2000 to 2016. It appears that California and Texas have the highest total number of outages, with 210 and 127 outages, respectively. There also seems to be a higher number of total outages in Washington and the Midwest. It appears that there may be geographic factors affecting the *number* of outages, but it is still unclear whether the number of outages is indicative of the *size* of the outages based on number of customers affected.
+It appears that California and Texas have the highest total number of outages, with 210 and 127 outages, respectively. There also seems to be a higher number of total outages in Washington and the Midwest. It appears that there may be geographic factors affecting the *number* of outages, but it is still unclear whether the number of outages is indicative of the *size* of the outages based on number of customers affected.
 
 ## Bivariate Analysis
+
+Here we are analyzing the number of customers affected by power outages based on the year.
 
 <iframe
   src="assets/fig3.html"
@@ -87,7 +93,9 @@ This choropleth shows the geographic distribution of the total number of outages
   frameborder="0"
 ></iframe>
 
-Here we are analyzing the number of customers affected by power outages based on the year. It appears that most of the largest magnitude outages (over 1M customers affected) occurred prior to 2011. It appears that the variability in the number of customers affected may have decreased over time, leading to fewer large-scale outage events. The most recent year we have data for, 2016, only had a maximum of 415,000 customers affected by a single outage, compared to millions of customers affected in previous years. It may be the case that future outages, on average, are less severe than past outages if this trend continues.
+It appears that most of the largest magnitude outages (over 1M customers affected) occurred prior to 2011. It appears that the variability in the number of customers affected may have decreased over time, leading to fewer large-scale outage events. The most recent year we have data for, 2016, only had a maximum of 415,000 customers affected by a single outage, compared to millions of customers affected in previous years. It may be the case that future outages, on average, are less severe than past outages if this trend continues.
+
+Again, we are looking at a geographic distribution of outages, but now, we are looking at the average number of customers affected per state rather than just the number of outages.
 
 <iframe
   src="assets/fig4.html"
@@ -96,7 +104,7 @@ Here we are analyzing the number of customers affected by power outages based on
   frameborder="0"
 ></iframe>
 
-Again, we are looking at a geographic distribution of outages, but now, we are looking at the average number of customers affected per state rather than just the number of outages. While California and Texas are still two of the highest severity states on average, Florida has the highest average customers affected. South Carolina and Illinois now stand out a bit more as having large-severity outages, showing a trend of higher severity outages in the Midwest and Eastern states. There may be a reason that these states in partcular tend to have widespread outages, but this would required further research.
+ While California and Texas are still two of the highest severity states on average, Florida has the highest average customers affected. South Carolina and Illinois now stand out a bit more as having large-severity outages, showing a trend of higher severity outages in the Midwest and Eastern states. There may be a reason that these states in particular tend to have widespread outages, but this would require further research.
 
 ## Interesting Aggregates
 
@@ -119,7 +127,7 @@ Now, let's take a look at the average number of customers affected based on NERC
 | ASCC          |                14273 |
 | FRCC, SERC    |                  nan |
 
-It appears that there is some variation in the average number of customers affected per outage based on the NERC.REGION. Region HI has the highest average, although this region has had less than 5 total outages, so this may not be a large enough sample size to compare to other regions. Regions FRCC, ECAR, and TRE also had an average of over 200,000 customers affected. Regions MRO, PR, and ASCC are among the smallest average number of customers affected. Interestingly, region FRCC, SERC has no data on the number of customers affected.
+It appears that there is some variation in the average number of customers affected per outage based on the NERC.REGION. Region HI has the highest average, although this region has had less than 5 total outages, so this may not be a large enough sample size to fairly compare to other regions. Regions FRCC, ECAR, and TRE also had an average of over 200,000 customers affected. Regions MRO, PR, and ASCC are among the smallest average number of customers affected. Interestingly, region FRCC, SERC has no data on the number of customers affected.
 
 ## Imputation
 
@@ -199,7 +207,7 @@ The following are features in my model:
        'POP_URBAN', 'POP_UC'
 
 - Ordinal: 2 (MONTH, CLIMATE.CATEGORY)
-- Nominal: 5 (POSTAL.CODE, NERC.REGION, CLIMATE.REGION, CLIMATE.CATEGORY, CAUSE.CATEGORY, CAUSE.CATEGORY.DETAILED)
+- Nominal: 5 (POSTAL.CODE, NERC.REGION, CLIMATE.REGION, CAUSE.CATEGORY, CAUSE.CATEGORY.DETAILED)
 - Quantitative: 39 (all other variables)
 
 I encoded all my categorical variables using a One Hot Encoder.
